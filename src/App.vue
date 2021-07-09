@@ -1,28 +1,36 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <date-picker
+      locale="en" 
+      v-model="datetime"
+      format="YYYY-MM-DD HH:mm"
+      type="datetime"
+      :jumpMinute="15"
+      :roundMinute="true"
+      :disable="['Saturday', 'Sunday', /(.*)01:(.*)/,/(.*)02:(.*)/,/(.*)03:(.*)/,/(.*)04:(.*)/, /(.*)05:(.*)/, /(.*)06:(.*)/, /(.*)07:(.*)/, /(.*)18:(.*)/, /(.*)19:(.*)/, /(.*)20:(.*)/, /(.*)21:(.*)/, /(.*)22:(.*)/ , /(.*)23:(.*)/ ]"
+      :color="colors[activeColorIndex]"
+      :show="show"
+      @close="show=false"
+
+    />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import DatePicker from 'vue-datetime-js';
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    DatePicker
+  }, data() {
+    return {
+      datetime: '',
+      show: false,
+      colors: ['#5c6bc0', '#e91e63', '#7b1fa2', '#1e88e5', '#03a9f4', '#00acc1', '#ff9800', 'dimgray'],
+      activeColorIndex: 4,
+    }
   }
 }
-</script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+</script>
