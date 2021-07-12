@@ -1,9 +1,11 @@
 <template>
   <date-picker
+    id="callTime"
     locale="en"
-    v-model="datetime"
+    v-model="bestTimeToCall"
     format="YYYY-MM-DD HH:mm"
     type="datetime"
+    placeholder="Best Time to Call"
     :jumpMinute="15"
     :roundMinute="true"
     :disable="[
@@ -39,7 +41,7 @@ export default {
   },
   data() {
     return {
-      datetime: "",
+      bestTimeToCall: "",
       show: false,
       colors: [
         "#5c6bc0",
