@@ -1,8 +1,8 @@
 <template>
-  <date-picker
+<div>
+   <date-picker
     id="callTime"
     locale="en"
-    v-model="bestTimeToCall"
     format="YYYY-MM-DD HH:mm"
     type="datetime"
     placeholder="Best Time to Call"
@@ -28,7 +28,13 @@
     :color="colors[activeColorIndex]"
     :show="show"
     @close="show = false"
+    v-model="selectedDate"
+    v-on:change="dateChanged"
+
   />
+
+</div>
+ 
 </template>
 
 <script>
@@ -41,7 +47,7 @@ export default {
   },
   data() {
     return {
-      bestTimeToCall: "",
+      selectedDate: null,
       show: false,
       colors: [
         "#5c6bc0",
@@ -56,5 +62,10 @@ export default {
       activeColorIndex: 4,
     };
   },
+  methods: {
+    dateChanged: function(){
+      this.$emit('update:date', this.selectedDate);
+    }
+  }
 };
 </script>

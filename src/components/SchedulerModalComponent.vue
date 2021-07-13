@@ -62,7 +62,7 @@
           required
         />
 
-        <Date />
+        <DateTime @update:date="dateChanged"/>
 
           <input name="submit" type="submit" value="SUBMIT" class="continue" />
 
@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import Date from "./DatePickerComponent.vue";
+import DateTime from "./DatePickerComponent.vue";
 
 export default {
   name: "SchedulerModal",
@@ -103,17 +103,19 @@ export default {
           };
       },
   components: {
-    Date,
+    DateTime,
   },
   props: {
     showModal: Boolean,
     toggleModal: Function,
-    // formatPhone: Function,
   },
    methods: {
 
+     dateChanged: function(value){
+       this.bestTimeToCall = value;
+     },
+
      formatPhone() {
-       console.log('phone value:  '  + this.PhoneNumber);
        let val = this.PhoneNumber;
        this.PhoneNumber = val.replace(/\D/g, '').replace(/(\d{1,3})(\d{1,3})?(\d{1,4})?/g, function(txt, f, s, t) {
             if (t) {
@@ -128,25 +130,15 @@ export default {
  
     processForm: function(e) {
         let multivariateId = '1049649';
-        let notSaveSignup = false;
-
-        console.log('Multi Variant ID: ' + multivariateId);
-        console.log('Not Save Signup: ' + notSaveSignup);
-
-        console.log('First Name: ' + this.FirstName);
-        console.log('Last Name: ' + this.LastName);
-        console.log('Email: ' + this.email);
-        console.log('Phone Number: ' + this.PhoneNumber);
-        console.log('Best Time to Call: ' + this.bestTimeToCall);
-        console.log('Formatted Datetime: ' + this.bestTimeToCall);
+        let notSaveSignup = false;  
 
         let formData = {
-            multivariateId: this.value,
-            notSaveSignup: this.value,
+            multivariateId: multivariateId,
+            notSaveSignup: notSaveSignup,
             firstName: this.FirstName,
             lastName: this.LastName,
             email: this.email,
-            phoneNumber: this.PhoneNumber,
+            phoneNumber: encodeURIComponent(this.PhoneNumber.trim()),
             bestTimeToCall: this.bestTimeToCall
         }
 
@@ -166,8 +158,13 @@ export default {
 function validateForm(data) {
 
     const validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-
+    var currentDate = new Date();
+    var selectedDate = new Date(data.bestTimeToCall);
     let messages = [];
+
+    if(selectedDate < currentDate){
+        messages.push('Please select a future date.');
+    }
 
     if (data.phoneNumber.length < 10) {
         messages.push('Please enter a valid phone number.');
@@ -178,7 +175,6 @@ function validateForm(data) {
     }
 
     return messages;
-
 }
 
 function submitForm(data) {
@@ -187,7 +183,7 @@ function submitForm(data) {
         'Origin': 'https://apps.pubsvs.com',
     });
 
-    const url = 'https://signup.oxfordclub.com/Content/SaveFreeSignups?MultivariateId=' + data.multivariateId + '&oneClick=true&email=' + data.email + '&FirstName=' + data.firstName + '&LastName=' + data.lastName + '&PhoneNumber=' + data.phoneNumber + '&BestTimeToCall=' + data.bestTimeToCall;
+    const url = 'https://signup.oxfordclub.com/Content/SaveFreeSignups?MultivariateId=' + data.multivariateId + '&oneClick=true&email=' + data.email + '&FirstName=' + data.firstName + '&LastName=' + data.lastName + '&PhoneNumber=' + data.phoneNumber + '&BestTimeToCall=' + encodeURIComponent(data.bestTimeToCall.trim());
 
     fetch(url, {
             method: 'POST',
@@ -199,8 +195,9 @@ function submitForm(data) {
         .then(res => console.log(res));
 }
 
-function showConfirmationMessage(bestTimeToCall) {
+function showConfirmationMessage(datetime) {
 
+    const bestTimeToCall = new Date(datetime);
     const schedulerMain = document.getElementById('scheduler-main');
     const confirmation = document.getElementsByClassName('scheduler-confirmation');
     const circleLoader = document.getElementsByClassName('circle-loader');
@@ -208,14 +205,11 @@ function showConfirmationMessage(bestTimeToCall) {
     const confirmationMessage = document.getElementsByClassName('confirmation-message');
     const time = bestTimeToCall.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric' });
 
-
     schedulerMain.style.display = "none";
     confirmation[0].style.display = "block";
     circleLoader[0].classList.toggle('load-complete');
     checkmark[0].style.display = "block";
     confirmationMessage[0].innerHTML = "Thank you for scheduling a time with one of our VIP specialists. Get your questions ready! We are excited to help you in any way that you can. Your call is reserved for " + time + ' on ' + getMonthName(bestTimeToCall.getMonth()) + ' ' + bestTimeToCall.getDate();
-
-
 }
 
 
